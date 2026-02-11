@@ -116,11 +116,11 @@ class ProgressionTrainer:
         
         # Voice leading preferences based on current chord
         voice_leading_preferences = {
-            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.VI, ChordNumber.II, ChordNumber.III],
-            ChordNumber.II: [ChordNumber.V, ChordNumber.IV],
+            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.VI, ChordNumber.II, ChordNumber.III, ChordNumber.VII],
+            ChordNumber.II: [ChordNumber.V, ChordNumber.IV, ChordNumber.VII],
             ChordNumber.III: [ChordNumber.VI, ChordNumber.IV, ChordNumber.I],
             ChordNumber.IV: [ChordNumber.I, ChordNumber.V, ChordNumber.II],
-            ChordNumber.V: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV],
+            ChordNumber.V: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
             ChordNumber.VI: [ChordNumber.IV, ChordNumber.I, ChordNumber.II, ChordNumber.III],
             ChordNumber.VII: [ChordNumber.I],
         }
