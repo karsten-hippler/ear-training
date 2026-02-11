@@ -1,0 +1,9 @@
+pygame>=2.1.0
+numpy>=1.21.0
+scipy>=1.7.0
+librosa>=0.9.0
+music21>=8.0
+pydantic>=2.0
+PyQt5>=5.15.0
+flask>=2.0.0
+flask-cors>=3.0.0
