@@ -20,17 +20,18 @@ createApp({
             resultClass: '',
             chordNotesDisplay: '',
             
-            allChords: ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'],
+            allChords: ['I', 'ii', 'iii', 'III7', 'IV', 'V', 'V7', 'vi', 'vii°'],
             progressionLength: 0,
             
             isPlaying: false,
+            answeredCurrent: false,
         };
     },
     
     computed: {
         userProgressionDisplay() {
             if (this.userProgression.length === 0) {
-                return '(no chords guessed yet)';
+                return '';
             }
             return this.userProgression.join(' - ');
         }
@@ -43,8 +44,10 @@ createApp({
                 'I': 'I',
                 'II': 'ii',
                 'III': 'iii',
+                'III7': 'III7',
                 'IV': 'IV',
                 'V': 'V',
+                'V7': 'V7',
                 'VI': 'vi',
                 'VII': 'vii°'
             };
@@ -113,11 +116,12 @@ createApp({
         },
         
         async playProgression() {
-            // Generate new progression if the current one is answered
-            if (this.userProgression.length === this.currentProgression.length && this.total > 0) {
+            // Generate a new progression if the previous one has been answered
+            // or if there is no progression yet.
+            if (this.answeredCurrent || this.currentProgression.length === 0) {
                 await this.generateNewProgression();
             }
-            
+
             await this.playChordsSequence();
         },
         
@@ -366,6 +370,7 @@ createApp({
                 this.userProgression = [];
                 this.resultMessage = '';
                 this.chordNotesDisplay = '';
+                this.answeredCurrent = false;
             } catch (error) {
                 console.error('Error generating progression:', error);
             }
@@ -430,6 +435,7 @@ createApp({
 
                 // After showing the solution, also show stacked chord notes
                 this.chordNotesDisplay = this.buildChordStackDisplay();
+                this.answeredCurrent = true;
             } catch (error) {
                 console.error('Error checking answer:', error);
                 this.resultMessage = `Error: ${error.message}`;

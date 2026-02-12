@@ -10,8 +10,10 @@ class ChordNumber(Enum):
     I = (0, "major")      # Tonic
     II = (2, "minor")     # Supertonic
     III = (4, "minor")    # Mediant
+    III7 = (4, "dominant7")  # Dominant seventh on III
     IV = (5, "major")     # Subdominant
     V = (7, "major")      # Dominant
+    V7 = (7, "dominant7") # Dominant seventh on V
     VI = (9, "minor")     # Submediant
     VII = (11, "diminished")  # Leading tone
 
@@ -116,12 +118,14 @@ class ProgressionTrainer:
         
         # Voice leading preferences based on current chord
         voice_leading_preferences = {
-            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.VI, ChordNumber.II, ChordNumber.III, ChordNumber.VII],
-            ChordNumber.II: [ChordNumber.V, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.III: [ChordNumber.VI, ChordNumber.IV, ChordNumber.I],
-            ChordNumber.IV: [ChordNumber.I, ChordNumber.V, ChordNumber.II],
+            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.V7, ChordNumber.VI, ChordNumber.II, ChordNumber.III, ChordNumber.III7, ChordNumber.VII],
+            ChordNumber.II: [ChordNumber.V, ChordNumber.V7, ChordNumber.IV, ChordNumber.VII],
+            ChordNumber.III: [ChordNumber.VI, ChordNumber.III7, ChordNumber.IV, ChordNumber.I],
+            ChordNumber.III7: [ChordNumber.VI, ChordNumber.IV, ChordNumber.I],
+            ChordNumber.IV: [ChordNumber.I, ChordNumber.V, ChordNumber.V7, ChordNumber.II],
             ChordNumber.V: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.VI: [ChordNumber.IV, ChordNumber.I, ChordNumber.II, ChordNumber.III],
+            ChordNumber.V7: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
+            ChordNumber.VI: [ChordNumber.IV, ChordNumber.I, ChordNumber.II, ChordNumber.III, ChordNumber.III7],
             ChordNumber.VII: [ChordNumber.I],
         }
         
@@ -146,18 +150,20 @@ class ProgressionTrainer:
             "major": [0, 4, 7],
             "minor": [0, 3, 7],
             "diminished": [0, 3, 6],
+            "dominant7": [0, 4, 7, 10],
         }
-        
+
         chord_intervals = intervals.get(chord_type, [0, 4, 7])
-        
-        # Apply inversion
-        if inversion == 1:
-            # First inversion: move lowest note up an octave
-            chord_intervals = [chord_intervals[1], chord_intervals[2], chord_intervals[0] + 12]
-        elif inversion == 2:
-            # Second inversion: move two lowest notes up an octave
-            chord_intervals = [chord_intervals[2], chord_intervals[0] + 12, chord_intervals[1] + 12]
-        
+
+        # Apply inversion. For triads (3 notes) we support root, 1st, 2nd inversion.
+        # For seventh chords (4 notes) we support root through 3rd inversion.
+        n = len(chord_intervals)
+        inversion = inversion % n  # safety guard
+
+        if inversion > 0:
+            rotated = chord_intervals[inversion:] + [i + 12 for i in chord_intervals[:inversion]]
+            chord_intervals = rotated
+
         return [root + interval for interval in chord_intervals]
     
     def get_progression_frequencies(self, 
@@ -230,10 +236,14 @@ class ProgressionTrainer:
         # Get average note of next chord in root position
         next_chord_notes = self.get_chord_notes(next_chord, 0)
         next_avg = sum(next_chord_notes) / len(next_chord_notes)
-        
+
+        # Determine how many inversions this chord supports (triad vs seventh)
+        base_notes = self.get_chord_notes(chord, 0)
+        num_inversions = len(base_notes)  # 3 for triads, 4 for sevenths
+
         # Collect all inversions with their distances
         inversions_with_distance = []
-        for inversion in range(3):
+        for inversion in range(num_inversions):
             chord_notes = self.get_chord_notes(chord, inversion)
             current_avg = sum(chord_notes) / len(chord_notes)
             
@@ -276,8 +286,11 @@ class ProgressionTrainer:
         best_distance = float('inf')
         
         previous_avg = sum(previous_notes) / len(previous_notes)
-        
-        for inversion in range(3):
+
+        base_notes = self.get_chord_notes(chord, 0)
+        num_inversions = len(base_notes)
+
+        for inversion in range(num_inversions):
             chord_notes = self.get_chord_notes(chord, inversion)
             current_avg = sum(chord_notes) / len(chord_notes)
             

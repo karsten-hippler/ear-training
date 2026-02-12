@@ -578,11 +578,11 @@ class ProgressionTrainingWindow(QMainWindow):
         
         # User's progression display and undo button
         answer_layout = QHBoxLayout()
-        self.user_progression_label = QLabel("Your answer: ")
+        self.user_progression_label = QLabel("")
         self.user_progression_label.setFont(QFont("Arial", 11))
         answer_layout.addWidget(self.user_progression_label)
         
-        self.undo_button = QPushButton("↶ Undo")
+        self.undo_button = QPushButton("↶")
         self.undo_button.setFont(QFont("Arial", 10))
         self.undo_button.setMaximumWidth(80)
         self.undo_button.clicked.connect(self.on_undo_clicked)
@@ -598,11 +598,23 @@ class ProgressionTrainingWindow(QMainWindow):
         
         # Chord buttons grid (Roman numerals)
         grid = QGridLayout()
-        chord_numbers = list(ChordNumber)
-        positions = [(0, i) for i in range(4)] + [(1, i) for i in range(3)]
-        
-        for i, chord in enumerate(chord_numbers):
-            row, col = positions[i]
+
+        # Explicit layout so we can control where extra sevenths appear.
+        # Desktop logic mirrors mobile: all basic chords in the first row,
+        # with extra chords (III7, V7) in the second row under their base chord.
+        chord_positions = {
+            ChordNumber.I: (0, 0),
+            ChordNumber.II: (0, 1),
+            ChordNumber.III: (0, 2),
+            ChordNumber.IV: (0, 3),
+            ChordNumber.V: (0, 4),
+            ChordNumber.VI: (0, 5),
+            ChordNumber.VII: (0, 6),
+            ChordNumber.III7: (1, 2),  # under III
+            ChordNumber.V7: (1, 4),    # under V
+        }
+
+        for chord, (row, col) in chord_positions.items():
             chord_type = chord.value[1]
             
             # Use lowercase for minor and diminished chords
@@ -655,9 +667,9 @@ class ProgressionTrainingWindow(QMainWindow):
         if len(self.user_progression) > 0:
             progression_str = " - ".join([c.name for c in self.user_progression])
         else:
-            progression_str = "(no chords guessed yet)"
+            progression_str = ""
         
-        self.user_progression_label.setText(f"Your answer: {progression_str}")
+        self.user_progression_label.setText(progression_str)
         
         # Show whether progression starts on tonic or random
         start_info = "starting with I (Tonic)" if self.start_on_tonic else "starting on any chord"

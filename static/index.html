@@ -3,98 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ear Training - Harmonic Progression</title>
+    <title>Harmonic Progression</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div id="app">
         <div class="container">
-            <h1>Ear Training - Harmonic Progression</h1>
-            
             <div class="score-section">
                 <p class="score">Score: {{ score }}/{{ total }}</p>
-            </div>
-
-            <!-- Options Section -->
-            <div class="options-section">
-                <div class="control-group">
-                    <label>Instrument:</label>
-                    <select v-model="selectedInstrument">
-                        <option>Piano</option>
-                        <option>Bell</option>
-                        <option>Violin</option>
-                        <option>Flute</option>
-                    </select>
-                </div>
-
-                <div class="control-group">
-                    <label>Number of Chords:</label>
-                    <select v-model="numChords">
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>Random</option>
-                    </select>
-                </div>
-
-                <div class="control-group">
-                    <label>Root Note Volume: {{ rootVolume }}%</label>
-                    <input type="range" v-model.number="rootVolume" min="100" max="1000" step="10">
-                </div>
-
-                <div class="control-group">
-                    <label>Playback Speed: {{ (playbackSpeed).toFixed(1) }}x</label>
-                    <input type="range" v-model.number="playbackSpeed" min="0.5" max="4.0" step="0.1">
-                </div>
-
-                <div class="checkboxes">
-                    <label>
-                        <input type="checkbox" v-model="startOnTonic">
-                        Start on Tonic
-                    </label>
-                    <label>
-                        <input type="checkbox" v-model="useCommonOnly">
-                        Common Progressions Only
-                    </label>
-                </div>
-            </div>
-
-            <!-- Instructions -->
-            <p class="instructions">
-                Listen to the chord progression, then click the chord numbers in order.
-            </p>
-
-            <!-- Progression Info -->
-            <div class="progression-info">
-                <p>Progression length: {{ progressionLength }} chords 
-                   ({{ startOnTonic ? 'starting with I (Tonic)' : 'starting on any chord' }})</p>
             </div>
 
             <!-- Play Buttons -->
             <div class="button-group">
                 <button @click="playProgression" class="btn btn-primary">▶ Play Progression</button>
-                <button @click="playArpeggio" class="btn btn-primary">▶ Play as Arpeggio</button>
                 <button @click="repeatProgression" class="btn btn-primary">↻ Repeat</button>
-                <button @click="playTonic" class="btn btn-secondary">♪ Play Tonic</button>
-                <button @click="testAudio" class="btn btn-secondary">🔊 Test Audio</button>
-            </div>
-
-            <!-- Chord Notes Display -->
-            <div v-if="chordNotesDisplay" class="chord-notes">
-                {{ chordNotesDisplay }}
             </div>
 
             <!-- User's Answer -->
-            <div class="answer-section">
-                <p>Your answer: {{ userProgressionDisplay }}</p>
-                <button v-if="userProgression.length > 0" @click="undoChord" class="btn btn-small">↶ Undo</button>
-            </div>
-
-            <!-- Result Message -->
-            <div v-if="resultMessage" :class="['result', resultClass]">
-                {{ resultMessage }}
+            <div class="answer-row">
+                <div class="answer-section">
+                    <p>{{ userProgressionDisplay }}</p>
+                </div>
+                <button @click="undoChord" class="btn btn-small answer-undo">↶</button>
             </div>
 
             <!-- Chord Buttons -->
@@ -107,6 +38,70 @@
                 >
                     {{ chord }}
                 </button>
+            </div>
+
+            <!-- Result Message (solution) -->
+            <div v-if="resultMessage" :class="['result', resultClass]">
+                {{ resultMessage }}
+            </div>
+
+            <!-- Chord Notes Display (stacked solution) -->
+            <div v-if="chordNotesDisplay" class="chord-notes">
+                {{ chordNotesDisplay }}
+            </div>
+
+            <!-- Bottom controls: settings and additional playback buttons -->
+            <div class="bottom-controls">
+                <!-- Options Section moved to bottom -->
+                <div class="options-section">
+                    <div class="control-group">
+                        <label>Instrument:</label>
+                        <select v-model="selectedInstrument">
+                            <option>Piano</option>
+                            <option>Bell</option>
+                            <option>Violin</option>
+                            <option>Flute</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Number of Chords:</label>
+                        <select v-model="numChords">
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>Random</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Root Note Volume: {{ rootVolume }}%</label>
+                        <input type="range" v-model.number="rootVolume" min="100" max="1000" step="10">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Playback Speed: {{ (playbackSpeed).toFixed(1) }}x</label>
+                        <input type="range" v-model.number="playbackSpeed" min="0.5" max="4.0" step="0.1">
+                    </div>
+
+                    <div class="checkboxes">
+                        <label>
+                            <input type="checkbox" v-model="startOnTonic">
+                            Start on Tonic
+                        </label>
+                        <label>
+                            <input type="checkbox" v-model="useCommonOnly">
+                            Common Progressions Only
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group bottom-button-group">
+                    <button @click="playArpeggio" class="btn btn-primary">▶ Play as Arpeggio</button>
+                    <button @click="playTonic" class="btn btn-secondary">♪ Play Tonic</button>
+                    <button @click="testAudio" class="btn btn-secondary">🔊 Test Audio</button>
+                </div>
             </div>
 
             <!-- Exit Button -->

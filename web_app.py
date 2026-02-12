@@ -229,9 +229,9 @@ def check_answer():
         chord_map = {
             'I': 'I', 'i': 'I',
             'II': 'II', 'ii': 'II',
-            'III': 'III', 'iii': 'III',
+            'III': 'III', 'iii': 'III', 'III7': 'III7',
             'IV': 'IV', 'iv': 'IV',
-            'V': 'V', 'v': 'V',
+            'V': 'V', 'v': 'V', 'V7': 'V7',
             'VI': 'VI', 'vi': 'VI',
             'VII': 'VII', 'vii': 'VII', 'vii°': 'VII'
         }
