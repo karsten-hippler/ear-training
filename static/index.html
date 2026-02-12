@@ -10,19 +10,9 @@
 <body>
     <div id="app">
         <div class="container">
-            <div class="score-section">
-                <p class="score">Score: {{ score }}/{{ total }}</p>
-            </div>
-
-            <!-- Play Buttons -->
-            <div class="button-group">
-                <button @click="playProgression" class="btn btn-primary">▶ Play Progression</button>
-                <button @click="repeatProgression" class="btn btn-primary">↻ Repeat</button>
-            </div>
-
             <!-- User's Answer -->
             <div class="answer-row">
-                <div class="answer-section">
+                <div class="answer-section" :class="resultClass">
                     <p>{{ userProgressionDisplay }}</p>
                 </div>
                 <button @click="undoChord" class="btn btn-small answer-undo">↶</button>
@@ -40,14 +30,25 @@
                 </button>
             </div>
 
+            <!-- Play Buttons (moved below chord buttons) -->
+            <div class="button-group">
+                <button @click="playProgression" class="btn btn-primary">▶ Play Progression</button>
+                <button @click="repeatProgression" class="btn btn-primary">↻ Repeat</button>
+            </div>
+
             <!-- Result Message (solution) -->
-            <div v-if="resultMessage" :class="['result', resultClass]">
+            <div v-if="resultMessage" class="result">
                 {{ resultMessage }}
             </div>
 
             <!-- Chord Notes Display (stacked solution) -->
             <div v-if="chordNotesDisplay" class="chord-notes">
                 {{ chordNotesDisplay }}
+            </div>
+
+            <!-- Score moved below resolution/solution box -->
+            <div class="score-section">
+                <p class="score">Score: {{ score }}/{{ total }}</p>
             </div>
 
             <!-- Bottom controls: settings and additional playback buttons -->

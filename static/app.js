@@ -369,6 +369,7 @@ createApp({
                 this.progressionLength = data.length;
                 this.userProgression = [];
                 this.resultMessage = '';
+                this.resultClass = '';
                 this.chordNotesDisplay = '';
                 this.answeredCurrent = false;
             } catch (error) {
@@ -422,14 +423,16 @@ createApp({
                 
                 // Convert enum names back to display format
                 const actualDisplay = data.actual.map(name => this.chordEnumToDisplay(name));
-                const userDisplay = data.user.map(name => this.chordEnumToDisplay(name));
+                const correctProgressionText = actualDisplay.join(' - ');
                 
+                // In the solution box, show only the correct progression,
+                // without any extra words or the user's answer.
                 if (data.correct) {
                     this.score += 1;
-                    this.resultMessage = `✓ Correct! Progression: ${actualDisplay.join(' - ')}`;
+                    this.resultMessage = correctProgressionText;
                     this.resultClass = 'success';
                 } else {
-                    this.resultMessage = `✗ Wrong. Correct: ${actualDisplay.join(' - ')}, You said: ${userDisplay.join(' - ')}`;
+                    this.resultMessage = correctProgressionText;
                     this.resultClass = 'error';
                 }
 
