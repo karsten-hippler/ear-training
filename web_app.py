@@ -49,8 +49,11 @@ def get_progression():
     # Get frequencies for the progression
     frequencies = progression_trainer.get_progression_frequencies(use_inversions=True)
     
-    # Return progression as strings
-    progression_strs = [chord.name for chord in progression]
+    # Return progression as strings, mapping special chords for display
+    name_map = {
+        ChordNumber.IIIAUG: "III+",
+    }
+    progression_strs = [name_map.get(chord, chord.name) for chord in progression]
     
     return jsonify({
         'progression': progression_strs,
@@ -122,7 +125,7 @@ def play_chord():
         else:
             waveform = waveform + tone
     
-    # If root volume multiplier is high, add extra emphasis to the
+    # If root volume multiplier is above 1.0, add extra emphasis to the
     # theoretical root note (not just the lowest/bass note).
     if root_volume_multiplier > 1.0:
         root_freq = None
@@ -162,8 +165,10 @@ def play_chord():
 
         root_tone = player.generate_rich_tone(root_freq, duration, instrument)
 
-        # Add the root tone with the specified multiplier (scaled reasonably)
-        extra_root_volume = (root_volume_multiplier - 1.0) * 0.3
+        # Add the root tone with the specified multiplier.
+        # A multiplier of 1.0 (0% slider) means no extra root.
+        # Higher values add proportionally more root before final normalization.
+        extra_root_volume = max(0.0, root_volume_multiplier - 1.0)
         waveform = waveform + (root_tone * extra_root_volume)
     
     # Normalize to prevent clipping
@@ -223,26 +228,28 @@ def check_answer():
     try:
         data = request.json
         progression_names = data.get('progression', [])
-        
-        # Convert chord names to enum (handle lowercase/mixed case)
-        # Map the display names to enum names
-        chord_map = {
-            'I': 'I', 'i': 'I',
-            'II': 'II', 'ii': 'II',
-            'III': 'III', 'iii': 'III', 'III7': 'III7',
-            'IV': 'IV', 'iv': 'IV',
-            'V': 'V', 'v': 'V', 'V7': 'V7',
-            'VI': 'VI', 'vi': 'VI',
-            'VII': 'VII', 'vii': 'VII', 'vii°': 'VII'
-        }
-        
+
+        # Convert chord display names to enum names in a robust,
+        # case-insensitive way (handles ii, V7, vii°, etc.).
         user_progression = []
         for chord_name in progression_names:
-            enum_name = chord_map.get(chord_name)
-            if enum_name:
-                user_progression.append(ChordNumber[enum_name])
+            # Normalize input (strip whitespace, then upper-case)
+            raw = str(chord_name)
+            normalized = raw.strip()
+            upper = normalized.upper()
+
+            # Treat VII° / vii° as VII
+            if upper.endswith('°'):
+                upper = upper[:-1]
+
+            # Treat III+ as the augmented mediant enum
+            if upper == 'III+':
+                upper = 'IIIAUG'
+
+            if upper in ChordNumber.__members__:
+                user_progression.append(ChordNumber[upper])
             else:
-                print(f"Warning: Unknown chord name '{chord_name}'")
+                print(f"Warning: Unknown chord name '{chord_name}' (normalized: '{normalized}', upper: '{upper}')")
                 return jsonify({'error': f'Unknown chord: {chord_name}'}), 400
         
         is_correct = progression_trainer.submit_answer(user_progression)
@@ -276,4 +283,4 @@ def health():
 
 if __name__ == '__main__':
     # Run without the Flask debug reloader so we bind cleanly to all interfaces
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5001, debug=False)

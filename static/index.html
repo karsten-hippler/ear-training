@@ -18,16 +18,22 @@
                 <button @click="undoChord" class="btn btn-small answer-undo">↶</button>
             </div>
 
-            <!-- Chord Buttons -->
+            <!-- Chord Buttons grouped by scale degree -->
             <div class="chord-grid">
-                <button 
-                    v-for="chord in allChords" 
-                    :key="chord"
-                    @click="guessChord(chord)"
-                    class="btn btn-chord"
+                <div 
+                    class="degree-group"
+                    v-for="group in chordGroups" 
+                    :key="group.degree"
                 >
-                    {{ chord }}
-                </button>
+                    <button
+                        v-for="chord in group.chords"
+                        :key="chord"
+                        @click="guessChord(chord)"
+                        class="btn btn-chord"
+                    >
+                        {{ chord }}
+                    </button>
+                </div>
             </div>
 
             <!-- Play Buttons (moved below chord buttons) -->

@@ -610,18 +610,23 @@ class ProgressionTrainingWindow(QMainWindow):
             ChordNumber.V: (0, 4),
             ChordNumber.VI: (0, 5),
             ChordNumber.VII: (0, 6),
-            ChordNumber.III7: (1, 2),  # under III
-            ChordNumber.V7: (1, 4),    # under V
+            ChordNumber.IIIAUG: (1, 2),  # III+
+            ChordNumber.III7: (2, 2),    # under III+
+            ChordNumber.V7: (1, 4),      # under V
         }
 
         for chord, (row, col) in chord_positions.items():
             chord_type = chord.value[1]
             
-            # Use lowercase for minor and diminished chords
-            if chord_type in ["minor", "diminished"]:
-                chord_label = chord.name.lower()
+            # Label formatting for different chord qualities
+            if chord is ChordNumber.IIIAUG:
+                chord_label = "III+"
             else:
-                chord_label = chord.name
+                # Use lowercase for minor and diminished chords
+                if chord_type in ["minor", "diminished"]:
+                    chord_label = chord.name.lower()
+                else:
+                    chord_label = chord.name
             
             btn_label = f"{chord_label}\n({chord_type})"
             btn = QPushButton(btn_label)

@@ -19,8 +19,16 @@ createApp({
             resultMessage: '',
             resultClass: '',
             chordNotesDisplay: '',
-            
-            allChords: ['I', 'ii', 'iii', 'III7', 'IV', 'V', 'V7', 'vi', 'vii°'],
+
+            chordGroups: [
+                { degree: 'I',   chords: ['I'] },
+                { degree: 'II',  chords: ['ii'] },
+                { degree: 'III', chords: ['iii', 'III+', 'III7'] },
+                { degree: 'IV',  chords: ['IV'] },
+                { degree: 'V',   chords: ['V', 'V7'] },
+                { degree: 'VI',  chords: ['vi'] },
+                { degree: 'VII', chords: ['vii\u00b0'] },
+            ],
             progressionLength: 0,
             
             isPlaying: false,
@@ -44,6 +52,8 @@ createApp({
                 'I': 'I',
                 'II': 'ii',
                 'III': 'iii',
+                'IIIAUG': 'III+',
+                'III+': 'III+',
                 'III7': 'III7',
                 'IV': 'IV',
                 'V': 'V',
@@ -184,6 +194,7 @@ createApp({
                         frequencies: frequencies,
                         instrument: this.selectedInstrument.toLowerCase(),
                         playback_speed: this.playbackSpeed,
+                        // Map 100–1000% slider to a 1.0–10.0x root multiplier
                         root_volume_multiplier: this.rootVolume / 100.0,
                         chord_name: chordName
                     })

@@ -10,6 +10,7 @@ class ChordNumber(Enum):
     I = (0, "major")      # Tonic
     II = (2, "minor")     # Supertonic
     III = (4, "minor")    # Mediant
+    IIIAUG = (4, "augmented")  # Augmented mediant
     III7 = (4, "dominant7")  # Dominant seventh on III
     IV = (5, "major")     # Subdominant
     V = (7, "major")      # Dominant
@@ -47,6 +48,7 @@ class ProgressionTrainer:
             [ChordNumber.VI, ChordNumber.IV, ChordNumber.I, ChordNumber.V],
             [ChordNumber.I, ChordNumber.V, ChordNumber.VI, ChordNumber.IV],
             [ChordNumber.I, ChordNumber.III, ChordNumber.VI, ChordNumber.IV, ChordNumber.V],
+            [ChordNumber.I, ChordNumber.IIIAUG, ChordNumber.VI, ChordNumber.IV, ChordNumber.V],
             [ChordNumber.I, ChordNumber.II, ChordNumber.V],
             [ChordNumber.I, ChordNumber.V, ChordNumber.I],
         ]
@@ -118,14 +120,15 @@ class ProgressionTrainer:
         
         # Voice leading preferences based on current chord
         voice_leading_preferences = {
-            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.V7, ChordNumber.VI, ChordNumber.II, ChordNumber.III, ChordNumber.III7, ChordNumber.VII],
+            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.V7, ChordNumber.VI, ChordNumber.II, ChordNumber.III, ChordNumber.IIIAUG, ChordNumber.III7, ChordNumber.VII],
             ChordNumber.II: [ChordNumber.V, ChordNumber.V7, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.III: [ChordNumber.VI, ChordNumber.III7, ChordNumber.IV, ChordNumber.I],
+            ChordNumber.III: [ChordNumber.VI, ChordNumber.IIIAUG, ChordNumber.III7, ChordNumber.IV, ChordNumber.I],
+            ChordNumber.IIIAUG: [ChordNumber.VI, ChordNumber.III, ChordNumber.III7, ChordNumber.IV, ChordNumber.I],
             ChordNumber.III7: [ChordNumber.VI, ChordNumber.IV, ChordNumber.I],
             ChordNumber.IV: [ChordNumber.I, ChordNumber.V, ChordNumber.V7, ChordNumber.II],
             ChordNumber.V: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
             ChordNumber.V7: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.VI: [ChordNumber.IV, ChordNumber.I, ChordNumber.II, ChordNumber.III, ChordNumber.III7],
+            ChordNumber.VI: [ChordNumber.IV, ChordNumber.I, ChordNumber.II, ChordNumber.III, ChordNumber.IIIAUG, ChordNumber.III7],
             ChordNumber.VII: [ChordNumber.I],
         }
         
@@ -150,6 +153,7 @@ class ProgressionTrainer:
             "major": [0, 4, 7],
             "minor": [0, 3, 7],
             "diminished": [0, 3, 6],
+            "augmented": [0, 4, 8],
             "dominant7": [0, 4, 7, 10],
         }
 
@@ -328,4 +332,7 @@ class ProgressionTrainer:
         Returns:
             String like "I - IV - V - I"
         """
-        return " - ".join([chord.name for chord in progression])
+        name_map = {
+            ChordNumber.IIIAUG: "III+",
+        }
+        return " - ".join([name_map.get(chord, chord.name) for chord in progression])
