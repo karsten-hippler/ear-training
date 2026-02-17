@@ -6,7 +6,7 @@ try:
     import pygame
 except ImportError:
     pygame = None
-    
+
 class AudioPlayer:
     """Handles audio synthesis and playback with instrument-like sounds."""
     
@@ -19,7 +19,8 @@ class AudioPlayer:
         """
         self.sample_rate = sample_rate
         self.duration = duration
-        pygame.mixer.init(frequency=sample_rate, size=-16, channels=2)
+        if pygame is not None:
+            pygame.mixer.init(frequency=sample_rate, size=-16, channels=2)
     
     def generate_sine_wave(self, frequency: float, 
                           duration: float | None = None) -> np.ndarray:
