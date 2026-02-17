@@ -210,6 +210,10 @@ class AudioPlayer:
         Args:
             waveform: Numpy array of audio samples
         """
+        # Skip if pygame is not available (e.g., on web servers)
+        if pygame is None:
+            return
+        
         # Convert to 16-bit PCM and normalize
         waveform = np.clip(waveform, -1.0, 1.0)
         waveform = np.int16(waveform * 32767)
