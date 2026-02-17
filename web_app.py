@@ -254,12 +254,17 @@ def check_answer():
         
         is_correct = progression_trainer.submit_answer(user_progression)
         
-        actual = [c.name for c in progression_trainer.current_progression]
+        # Map chord names for display consistency (same as /api/progression)
+        name_map = {
+            ChordNumber.IIIAUG: "III+",
+        }
+        actual = [name_map.get(c, c.name) for c in progression_trainer.current_progression]
+        user = [name_map.get(c, c.name) for c in user_progression]
         
         return jsonify({
             'correct': is_correct,
             'actual': actual,
-            'user': [c.name for c in user_progression]
+            'user': user
         })
     
     except Exception as e:
