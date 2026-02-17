@@ -10,9 +10,7 @@ class ChordNumber(Enum):
     I = (0, "major")      # Tonic
     II = (2, "minor")     # Supertonic
     III = (4, "minor")    # Mediant
-    git add .gitignore
-    git commit -m "Add .gitignore"
-    git push    IIIAUG = (4, "augmented")  # Augmented mediant
+    IIIAUG = (4, "augmented")  # Augmented mediant
     III7 = (4, "dominant7")  # Dominant seventh on III
     IV = (5, "major")     # Subdominant
     V = (7, "major")      # Dominant
