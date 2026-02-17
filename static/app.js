@@ -110,9 +110,9 @@ createApp({
                 lines.push(line);
             }
 
-            // Header with chord numbers (use enum names, like desktop)
+            // Header with chord numbers (apply display mapping for consistency)
             const header = this.currentProgression
-                .map(name => name.padStart(3, ' '))
+                .map(name => this.chordEnumToDisplay(name).padStart(3, ' '))
                 .join('  ');
 
             const separator = '-'.repeat(header.length);
