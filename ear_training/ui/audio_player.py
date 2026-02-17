@@ -2,9 +2,11 @@
 
 from typing import List
 import numpy as np
-import pygame
-
-
+try:
+    import pygame
+except ImportError:
+    pygame = None
+    
 class AudioPlayer:
     """Handles audio synthesis and playback with instrument-like sounds."""
     
