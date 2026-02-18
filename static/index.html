@@ -10,6 +10,14 @@
 <body>
     <div id="app">
         <div class="container">
+            <!-- Tab Navigation -->
+            <div class="tabs-navigation">
+                <button @click="activeTab = 'training'" :class="['tab-btn', {active: activeTab === 'training'}]">Training</button>
+                <button @click="activeTab = 'reference'" :class="['tab-btn', {active: activeTab === 'reference'}]">Reference</button>
+            </div>
+
+            <!-- Training Tab -->
+            <div v-show="activeTab === 'training'" class="tab-content">
             <!-- User's Answer -->
             <div class="answer-row">
                 <div class="answer-section" :class="resultClass">
@@ -116,6 +124,33 @@
                     <button @click="playTonic" class="btn btn-secondary">♪ Play Tonic</button>
                 </div>
             </div>
+            </div> <!-- End Training Tab -->
+
+            <!-- Reference Tab -->
+            <div v-show="activeTab === 'reference'" class="tab-content reference-tab">
+                <h2>Chord Reference</h2>
+                
+                <div class="reference-section">
+                    <h3>All Available Chords</h3>
+                    <div class="chords-list">
+                        <span v-for="chord in referenceData.all_chords" :key="chord" class="chord-badge">{{ chord }}</span>
+                    </div>
+                </div>
+
+                <div class="reference-section">
+                    <h3>Common Progressions</h3>
+                    <ul class="progressions-list">
+                        <li v-for="(prog, idx) in referenceData.common_progressions" :key="idx">{{ prog }}</li>
+                    </ul>
+                </div>
+
+                <div class="reference-section">
+                    <h3>Common Chord Movements</h3>
+                    <div class="movements-list">
+                        <div v-for="move in referenceData.chord_movements" :key="move" class="movement-item">{{ move }}</div>
+                    </div>
+                </div>
+            </div> <!-- End Reference Tab -->
 
             <!-- Exit Button -->
             <button @click="exit" class="btn btn-danger">Exit</button>

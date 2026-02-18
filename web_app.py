@@ -61,6 +61,42 @@ def get_progression():
         'frequencies': frequencies
     })
 
+@app.route('/api/reference', methods=['GET'])
+def get_reference():
+    """Get common progressions and chord reference information."""
+    # Map chord names for display
+    name_map = {
+        ChordNumber.IIIAUG: "III+",
+    }
+    
+    # Get all common progressions from the trainer
+    common_progs = progression_trainer.common_progressions
+    
+    # Convert to displayable format
+    progressions_display = []
+    for prog in common_progs:
+        prog_strs = [name_map.get(chord, chord.name) for chord in prog]
+        progressions_display.append(' - '.join(prog_strs))
+    
+    # All available chords
+    all_chords = [name_map.get(chord, chord.name) for chord in ChordNumber]
+    
+    # Extract unique movements from common progressions
+    movements = set()
+    for prog in common_progs:
+        for i in range(len(prog) - 1):
+            current = name_map.get(prog[i], prog[i].name)
+            next_chord = name_map.get(prog[i+1], prog[i+1].name)
+            movements.add(f"{current} → {next_chord}")
+    
+    movements_sorted = sorted(list(movements))
+    
+    return jsonify({
+        'common_progressions': progressions_display,
+        'all_chords': all_chords,
+        'chord_movements': movements_sorted
+    })
+
 @app.route('/api/play-chord', methods=['POST'])
 def play_chord():
     """Generate audio for a chord and return as WAV."""

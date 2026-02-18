@@ -34,6 +34,13 @@ createApp({
             
             isPlaying: false,
             answeredCurrent: false,
+            
+            activeTab: 'training',
+            referenceData: {
+                all_chords: [],
+                common_progressions: [],
+                chord_movements: []
+            },
         };
     },
     
@@ -328,6 +335,15 @@ createApp({
         },
         
 
+        async loadReferenceData() {
+            try {
+                const response = await fetch('/api/reference');
+                const data = await response.json();
+                this.referenceData = data;
+            } catch (error) {
+                console.error('Error loading reference data:', error);
+            }
+        },
         
         async generateNewProgression() {
             try {
@@ -444,5 +460,6 @@ createApp({
     
     mounted() {
         this.generateNewProgression();
+        this.loadReferenceData();
     }
 }).mount('#app');
