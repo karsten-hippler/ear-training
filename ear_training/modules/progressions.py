@@ -57,6 +57,13 @@ class ProgressionTrainer:
             [ChordNumber.I, ChordNumber.IIIAUG, ChordNumber.VI, ChordNumber.IV, ChordNumber.V],
             [ChordNumber.I, ChordNumber.II, ChordNumber.V],
             [ChordNumber.I, ChordNumber.V, ChordNumber.I],
+            # Diatonic 7th chord progressions
+            [ChordNumber.IMAJ7, ChordNumber.VI, ChordNumber.IIM7, ChordNumber.V7],
+            [ChordNumber.IMAJ7, ChordNumber.IV, ChordNumber.V7],
+            [ChordNumber.I, ChordNumber.VIM7, ChordNumber.IIM7, ChordNumber.V7],
+            [ChordNumber.IMAJ7, ChordNumber.IVMAJ7, ChordNumber.V7, ChordNumber.IMAJ7],
+            [ChordNumber.I, ChordNumber.VI, ChordNumber.IIM7, ChordNumber.V7],
+            [ChordNumber.IMAJ7, ChordNumber.VI, ChordNumber.IV, ChordNumber.V7],
         ]
     
     def generate_progression(self, num_chords: int | None = None, start_on_tonic: bool = True, use_common_only: bool = False) -> List[ChordNumber]:
