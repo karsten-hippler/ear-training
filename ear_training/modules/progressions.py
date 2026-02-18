@@ -266,7 +266,6 @@ class ProgressionTrainer:
                 semitones_from_a4 = (octave - 4) * 12 + note_in_octave - 9
                 bass_frequency = self.base_freq * (2 ** (semitones_from_a4 / 12))
                 frequencies.insert(0, bass_frequency)  # Add bass as lowest note
-                frequencies.insert(0, bass_frequency)  # Add bass as lowest note
             
             all_frequencies.append(frequencies)
             previous_notes = chord_notes  # Track for voice leading on next chord
