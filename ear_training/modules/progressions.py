@@ -263,12 +263,20 @@ class ProgressionTrainer:
                 frequency = self.base_freq * (2 ** (semitones_from_a4 / 12))
                 frequencies.append(frequency)
             
-            frequencies.sort()  # Sort for proper chord voicing
+            # Don't sort frequencies - maintain voice leading relationships
+            # Each voice should move to the nearest note in the next chord
             
-            # Add bass line if requested
-            if include_bass_line:
+            # Track semitone values of notes we're actually playing for voice leading
+            actual_notes_semitones = list(notes_to_play)  # The notes we're playing (3rd, 5th for bass line triads)
+            
+            # Add bass line if requested (only for triads; 7th chords already have root in bass)
+            if include_bass_line and len(self.get_chord_notes(chord, 0)) == 3:
                 # Get the root note (first note of the chord in root position)
                 root_semitone = self.get_chord_notes(chord, 0)[0]
+                # Add the root an octave lower (adjust down by 12 semitones)
+                bass_note_semitone = root_semitone - 12
+                actual_notes_semitones.insert(0, bass_note_semitone)  # Track for voice leading
+                
                 # Add the root an octave lower
                 bass_octave = base_octave - 1
                 octave = bass_octave + (root_semitone // 12)
@@ -278,7 +286,7 @@ class ProgressionTrainer:
                 frequencies.insert(0, bass_frequency)  # Add bass as lowest note
             
             all_frequencies.append(frequencies)
-            previous_notes = chord_notes  # Use original notes for voice leading on next chord
+            previous_notes = actual_notes_semitones  # Track actual notes for voice leading
         
         return all_frequencies
     
