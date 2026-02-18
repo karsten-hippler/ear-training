@@ -61,28 +61,6 @@ def get_progression():
         'frequencies': frequencies
     })
 
-@app.route('/api/test-audio', methods=['POST'])
-def test_audio():
-    """Test endpoint that generates a simple sine wave."""
-    data = request.json
-    frequency = data.get('frequency', 440.0)
-    duration = data.get('duration', 1.0)
-    
-    sample_rate = 44100
-    t = np.linspace(0, duration, int(sample_rate * duration), False)
-    waveform = np.sin(2 * np.pi * frequency * t) * 0.7  # Reduced amplitude to 0.7
-    
-    # Convert to audio file
-    audio_data = (waveform * 32767).astype(np.int16)
-    
-    buffer = io.BytesIO()
-    wavfile.write(buffer, sample_rate, audio_data)
-    buffer.seek(0)
-    
-    print(f"Generated test audio: {frequency}Hz, {duration}s, waveform min={waveform.min():.4f}, max={waveform.max():.4f}")
-    
-    return send_file(buffer, mimetype='audio/wav')
-
 @app.route('/api/play-chord', methods=['POST'])
 def play_chord():
     """Generate audio for a chord and return as WAV."""

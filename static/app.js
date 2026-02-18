@@ -318,47 +318,7 @@ createApp({
             }
         },
         
-        async testAudio() {
-            console.log('Testing audio generation...');
-            try {
-                const response = await fetch('/api/test-audio', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        frequency: 440.0, // A4
-                        duration: 1.0
-                    })
-                });
-                
-                if (!response.ok) {
-                    console.error('Test audio error response:', response.status);
-                    alert('Test audio failed: HTTP ' + response.status);
-                    return;
-                }
-                
-                const audioBlob = await response.blob();
-                console.log('Test audio blob size:', audioBlob.size, 'bytes');
-                
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                audio.volume = 0.8;
-                
-                console.log('Playing test audio...');
-                const playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => console.log('Test audio started playing'))
-                        .catch(error => console.error('Test audio play error:', error));
-                }
-                
-                alert('Test audio should be playing now (440 Hz sine wave). Check browser console for details.');
-            } catch (error) {
-                console.error('Error in test audio:', error);
-                alert('Error testing audio: ' + error.message);
-            }
-        },
+
         
         async generateNewProgression() {
             try {
