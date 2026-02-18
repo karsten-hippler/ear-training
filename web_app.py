@@ -101,11 +101,17 @@ def get_progression():
         # Check if progression contains any deactivated chords
         # Use same name mapping as reference endpoint
         name_map = {
+            ChordNumber.IMAJ7: "Imaj7",
             ChordNumber.II: "ii",
+            ChordNumber.IIM7: "ii7",
             ChordNumber.III: "iii",
+            ChordNumber.IIIM7: "iii7",
             ChordNumber.IIIAUG: "III+",
+            ChordNumber.IVMAJ7: "IVmaj7",
             ChordNumber.VI: "vi",
+            ChordNumber.VIM7: "vi7",
             ChordNumber.VII: "vii°",
+            ChordNumber.VIIM7B5: "viiø7",
         }
         
         has_deactivated = False
@@ -140,11 +146,17 @@ def get_reference():
     """Get common progressions and chord reference information."""
     # Map chord names for display - must match frontend's chordEnumToDisplay function
     name_map = {
+        ChordNumber.IMAJ7: "Imaj7",
         ChordNumber.II: "ii",
+        ChordNumber.IIM7: "ii7",
         ChordNumber.III: "iii",
+        ChordNumber.IIIM7: "iii7",
         ChordNumber.IIIAUG: "III+",
+        ChordNumber.IVMAJ7: "IVmaj7",
         ChordNumber.VI: "vi",
+        ChordNumber.VIM7: "vi7",
         ChordNumber.VII: "vii°",
+        ChordNumber.VIIM7B5: "viiø7",
     }
     
     # Get all common progressions from the trainer
@@ -466,11 +478,17 @@ def check_answer():
         
         # Map chord names for display consistency (same as /api/progression)
         name_map = {
+            ChordNumber.IMAJ7: "Imaj7",
             ChordNumber.II: "ii",
+            ChordNumber.IIM7: "ii7",
             ChordNumber.III: "iii",
+            ChordNumber.IIIM7: "iii7",
             ChordNumber.IIIAUG: "III+",
+            ChordNumber.IVMAJ7: "IVmaj7",
             ChordNumber.VI: "vi",
+            ChordNumber.VIM7: "vi7",
             ChordNumber.VII: "vii°",
+            ChordNumber.VIIM7B5: "viiø7",
         }
         actual = [name_map.get(c, c.name) if isinstance(c, ChordNumber) else c for c in expected_progression]
         user = [name_map.get(c, c.name) for c in user_progression]

@@ -22,13 +22,13 @@ createApp({
             chordNotesDisplay: '',
 
             chordGroups: [
-                { degree: 'I',   chords: ['I'] },
-                { degree: 'II',  chords: ['ii'] },
-                { degree: 'III', chords: ['iii', 'III+', 'III7'] },
-                { degree: 'IV',  chords: ['IV'] },
+                { degree: 'I',   chords: ['I', 'Imaj7'] },
+                { degree: 'II',  chords: ['ii', 'ii7'] },
+                { degree: 'III', chords: ['iii', 'iii7', 'III+', 'III7'] },
+                { degree: 'IV',  chords: ['IV', 'IVmaj7'] },
                 { degree: 'V',   chords: ['V', 'V7'] },
-                { degree: 'VI',  chords: ['vi'] },
-                { degree: 'VII', chords: ['vii\u00b0'] },
+                { degree: 'VI',  chords: ['vi', 'vi7'] },
+                { degree: 'VII', chords: ['vii°', 'viiø7'] },
             ],
             progressionLength: 0,
             
@@ -62,16 +62,22 @@ createApp({
         chordEnumToDisplay(enumName) {
             const displayMap = {
                 'I': 'I',
+                'IMAJ7': 'Imaj7',
                 'II': 'ii',
+                'IIM7': 'ii7',
                 'III': 'iii',
+                'IIIM7': 'iii7',
                 'IIIAUG': 'III+',
                 'III+': 'III+',
                 'III7': 'III7',
                 'IV': 'IV',
+                'IVMAJ7': 'IVmaj7',
                 'V': 'V',
                 'V7': 'V7',
                 'VI': 'vi',
-                'VII': 'vii°'
+                'VIM7': 'vi7',
+                'VII': 'vii°',
+                'VIIM7B5': 'viiø7',
             };
             return displayMap[enumName] || enumName;
         },

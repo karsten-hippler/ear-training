@@ -8,15 +8,21 @@ import random
 class ChordNumber(Enum):
     """Roman numeral chord numbers for progressions."""
     I = (0, "major")      # Tonic
+    IMAJ7 = (0, "maj7")   # Major 7th on I
     II = (2, "minor")     # Supertonic
+    IIM7 = (2, "m7")      # Minor 7th on II
     III = (4, "minor")    # Mediant
+    IIIM7 = (4, "m7")     # Minor 7th on III
     IIIAUG = (4, "augmented")  # Augmented mediant
     III7 = (4, "dominant7")  # Dominant seventh on III
     IV = (5, "major")     # Subdominant
+    IVMAJ7 = (5, "maj7")  # Major 7th on IV
     V = (7, "major")      # Dominant
     V7 = (7, "dominant7") # Dominant seventh on V
     VI = (9, "minor")     # Submediant
+    VIM7 = (9, "m7")      # Minor 7th on VI
     VII = (11, "diminished")  # Leading tone
+    VIIM7B5 = (11, "m7b5")  # Half-diminished 7th on VII
 
 
 class ProgressionTrainer:
@@ -120,16 +126,22 @@ class ProgressionTrainer:
         
         # Voice leading preferences based on current chord
         voice_leading_preferences = {
-            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.V7, ChordNumber.VI, ChordNumber.II, ChordNumber.III, ChordNumber.IIIAUG, ChordNumber.III7, ChordNumber.VII],
-            ChordNumber.II: [ChordNumber.V, ChordNumber.V7, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.III: [ChordNumber.VI, ChordNumber.IIIAUG, ChordNumber.III7, ChordNumber.IV, ChordNumber.I],
+            ChordNumber.I: [ChordNumber.IV, ChordNumber.V, ChordNumber.V7, ChordNumber.VI, ChordNumber.II, ChordNumber.III, ChordNumber.IIIAUG, ChordNumber.III7, ChordNumber.VII, ChordNumber.IMAJ7, ChordNumber.IIM7, ChordNumber.IIIM7, ChordNumber.IVMAJ7, ChordNumber.VIM7, ChordNumber.VIIM7B5],
+            ChordNumber.IMAJ7: [ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.V, ChordNumber.V7, ChordNumber.VI, ChordNumber.VIM7, ChordNumber.II, ChordNumber.IIM7],
+            ChordNumber.II: [ChordNumber.V, ChordNumber.V7, ChordNumber.IV, ChordNumber.VII, ChordNumber.VIIM7B5],
+            ChordNumber.IIM7: [ChordNumber.V, ChordNumber.V7, ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.VII, ChordNumber.VIIM7B5],
+            ChordNumber.III: [ChordNumber.VI, ChordNumber.IIIAUG, ChordNumber.III7, ChordNumber.IV, ChordNumber.I, ChordNumber.VIM7],
+            ChordNumber.IIIM7: [ChordNumber.VI, ChordNumber.VIM7, ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.I],
             ChordNumber.IIIAUG: [ChordNumber.VI, ChordNumber.III, ChordNumber.III7, ChordNumber.IV, ChordNumber.I],
             ChordNumber.III7: [ChordNumber.VI, ChordNumber.IV, ChordNumber.I],
-            ChordNumber.IV: [ChordNumber.I, ChordNumber.V, ChordNumber.V7, ChordNumber.II],
-            ChordNumber.V: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.V7: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.VI: [ChordNumber.IV, ChordNumber.I, ChordNumber.II, ChordNumber.III, ChordNumber.IIIAUG, ChordNumber.III7],
-            ChordNumber.VII: [ChordNumber.I],
+            ChordNumber.IV: [ChordNumber.I, ChordNumber.V, ChordNumber.V7, ChordNumber.II, ChordNumber.IMAJ7, ChordNumber.VII],
+            ChordNumber.IVMAJ7: [ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.V, ChordNumber.V7, ChordNumber.II, ChordNumber.IIM7],
+            ChordNumber.V: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII, ChordNumber.IMAJ7, ChordNumber.VIM7],
+            ChordNumber.V7: [ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.VI, ChordNumber.VIM7, ChordNumber.IV, ChordNumber.VII],
+            ChordNumber.VI: [ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.II, ChordNumber.IIM7, ChordNumber.III, ChordNumber.IIIM7, ChordNumber.IIIAUG, ChordNumber.III7],
+            ChordNumber.VIM7: [ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.II, ChordNumber.IIM7, ChordNumber.III, ChordNumber.IIIM7],
+            ChordNumber.VII: [ChordNumber.I, ChordNumber.IMAJ7],
+            ChordNumber.VIIM7B5: [ChordNumber.I, ChordNumber.IMAJ7],
         }
         
         preferred_chords = voice_leading_preferences.get(current_chord, list(ChordNumber))
@@ -155,6 +167,9 @@ class ProgressionTrainer:
             "diminished": [0, 3, 6],
             "augmented": [0, 4, 8],
             "dominant7": [0, 4, 7, 10],
+            "maj7": [0, 4, 7, 11],
+            "m7": [0, 3, 7, 10],
+            "m7b5": [0, 3, 6, 10],
         }
 
         chord_intervals = intervals.get(chord_type, [0, 4, 7])
@@ -334,5 +349,16 @@ class ProgressionTrainer:
         """
         name_map = {
             ChordNumber.IIIAUG: "III+",
+            ChordNumber.IMAJ7: "Imaj7",
+            ChordNumber.IIM7: "ii7",
+            ChordNumber.IIIM7: "iii7",
+            ChordNumber.IVMAJ7: "IVmaj7",
+            ChordNumber.VIM7: "vi7",
+            ChordNumber.VIIM7B5: "viiø7",
+            # Also maintain case conversions for basic chords
+            ChordNumber.II: "ii",
+            ChordNumber.III: "iii",
+            ChordNumber.VI: "vi",
+            ChordNumber.VII: "vii°",
         }
         return " - ".join([name_map.get(chord, chord.name) for chord in progression])
