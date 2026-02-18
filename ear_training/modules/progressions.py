@@ -64,6 +64,22 @@ class ProgressionTrainer:
             [ChordNumber.IMAJ7, ChordNumber.IVMAJ7, ChordNumber.V7, ChordNumber.IMAJ7],
             [ChordNumber.I, ChordNumber.VI, ChordNumber.IIM7, ChordNumber.V7],
             [ChordNumber.IMAJ7, ChordNumber.VI, ChordNumber.IV, ChordNumber.V7],
+            # Minor key progressions (vi as minor tonic)
+            [ChordNumber.VI, ChordNumber.IV, ChordNumber.V, ChordNumber.VI],
+            [ChordNumber.VI, ChordNumber.VII, ChordNumber.VI],
+            [ChordNumber.VI, ChordNumber.III, ChordNumber.VII, ChordNumber.VI],
+            [ChordNumber.VI, ChordNumber.IV, ChordNumber.VII],
+            [ChordNumber.VI, ChordNumber.I, ChordNumber.V],
+            [ChordNumber.VI, ChordNumber.II, ChordNumber.V],
+            [ChordNumber.VI, ChordNumber.IV, ChordNumber.I],
+            [ChordNumber.VI, ChordNumber.IV, ChordNumber.V, ChordNumber.VII],
+            [ChordNumber.VI, ChordNumber.II, ChordNumber.VII, ChordNumber.VI],
+            # Minor key progressions with 7th chords (vi as minor tonic)
+            [ChordNumber.VIM7, ChordNumber.IV, ChordNumber.V7, ChordNumber.VIM7],
+            [ChordNumber.VI, ChordNumber.IIM7, ChordNumber.V7, ChordNumber.VI],
+            [ChordNumber.VIM7, ChordNumber.IIM7, ChordNumber.V7],
+            [ChordNumber.VI, ChordNumber.IVMAJ7, ChordNumber.V7, ChordNumber.VI],
+            [ChordNumber.VIM7, ChordNumber.III, ChordNumber.V7, ChordNumber.VI],
         ]
     
     def generate_progression(self, num_chords: int | None = None, start_on_tonic: bool = True, use_common_only: bool = False) -> List[ChordNumber]:
@@ -145,10 +161,10 @@ class ProgressionTrainer:
             ChordNumber.IVMAJ7: [ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.V, ChordNumber.V7, ChordNumber.II, ChordNumber.IIM7],
             ChordNumber.V: [ChordNumber.I, ChordNumber.VI, ChordNumber.IV, ChordNumber.VII, ChordNumber.IMAJ7, ChordNumber.VIM7],
             ChordNumber.V7: [ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.VI, ChordNumber.VIM7, ChordNumber.IV, ChordNumber.VII],
-            ChordNumber.VI: [ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.II, ChordNumber.IIM7, ChordNumber.III, ChordNumber.IIIM7, ChordNumber.IIIAUG, ChordNumber.III7],
+            ChordNumber.VI: [ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.II, ChordNumber.IIM7, ChordNumber.III, ChordNumber.IIIM7, ChordNumber.IIIAUG, ChordNumber.III7, ChordNumber.VII, ChordNumber.V, ChordNumber.VIM7],
             ChordNumber.VIM7: [ChordNumber.IV, ChordNumber.IVMAJ7, ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.II, ChordNumber.IIM7, ChordNumber.III, ChordNumber.IIIM7],
-            ChordNumber.VII: [ChordNumber.I, ChordNumber.IMAJ7],
-            ChordNumber.VIIM7B5: [ChordNumber.I, ChordNumber.IMAJ7],
+            ChordNumber.VII: [ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.VI, ChordNumber.VIM7],
+            ChordNumber.VIIM7B5: [ChordNumber.I, ChordNumber.IMAJ7, ChordNumber.VI, ChordNumber.VIM7],
         }
         
         preferred_chords = voice_leading_preferences.get(current_chord, list(ChordNumber))
