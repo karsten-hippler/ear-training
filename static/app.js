@@ -380,6 +380,9 @@ createApp({
         
         async checkAnswer() {
             try {
+                console.log('Checking answer. Current progression:', this.currentProgression);
+                console.log('User progression:', this.userProgression);
+                
                 const response = await fetch('/api/check-answer', {
                     method: 'POST',
                     headers: {
@@ -392,6 +395,7 @@ createApp({
                 });
                 
                 const data = await response.json();
+                console.log('API response data:', data);
                 
                 if (!response.ok) {
                     console.error('Error response:', data);
@@ -403,8 +407,11 @@ createApp({
                 this.total += 1;
                 
                 // Convert enum names back to display format
+                console.log('data.actual before mapping:', data.actual);
                 const actualDisplay = data.actual.map(name => this.chordEnumToDisplay(name));
+                console.log('actualDisplay after mapping:', actualDisplay);
                 const correctProgressionText = actualDisplay.join(' - ');
+                console.log('Final solution text:', correctProgressionText);
                 
                 // In the solution box, show only the correct progression,
                 // without any extra words or the user's answer.
@@ -418,7 +425,9 @@ createApp({
                 }
 
                 // After showing the solution, also show stacked chord notes
-                this.chordNotesDisplay = this.buildChordStackDisplay();
+                const stackedDisplay = this.buildChordStackDisplay();
+                console.log('Stacked chord display:', stackedDisplay);
+                this.chordNotesDisplay = stackedDisplay;
                 this.answeredCurrent = true;
             } catch (error) {
                 console.error('Error checking answer:', error);
