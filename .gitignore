@@ -31,3 +31,4 @@ htmlcov/
 .env.local
 # Generated files
 custom_progressions.json
+deactivated_chords.json

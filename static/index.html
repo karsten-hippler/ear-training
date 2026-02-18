@@ -177,8 +177,16 @@
 
                 <div class="reference-section">
                     <h3>All Available Chords</h3>
-                    <div class="chords-list">
-                        <span v-for="chord in referenceData.all_chords" :key="chord" class="chord-badge">{{ chord }}</span>
+                    <p class="section-help">Click to deactivate/activate chords for progression generation</p>
+                    <div class="chords-list chord-toggles">
+                        <button 
+                            v-for="chord in referenceData.all_chords" 
+                            :key="chord"
+                            @click="toggleChordDeactivation(chord)"
+                            :class="['chord-toggle', {deactivated: isChordDeactivated(chord)}]"
+                        >
+                            {{ chord }}
+                        </button>
                     </div>
                 </div>
 

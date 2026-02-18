@@ -39,7 +39,8 @@ createApp({
             referenceData: {
                 all_chords: [],
                 common_progressions: [],
-                chord_movements: []
+                chord_movements: [],
+                deactivated_chords: []
             },
             creatingProgression: false,
             customProgression: [],
@@ -533,6 +534,46 @@ createApp({
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error deleting progression');
+            });
+        },
+        
+        isChordDeactivated(chord) {
+            return this.referenceData.deactivated_chords.includes(chord);
+        },
+        
+        toggleChordDeactivation(chord) {
+            const deactivated = this.referenceData.deactivated_chords;
+            if (deactivated.includes(chord)) {
+                // Reactivate
+                this.referenceData.deactivated_chords = deactivated.filter(c => c !== chord);
+            } else {
+                // Deactivate
+                this.referenceData.deactivated_chords.push(chord);
+            }
+            
+            // Save to backend
+            this.saveDeactivatedChords();
+        },
+        
+        saveDeactivatedChords() {
+            fetch('/api/deactivated-chords', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    deactivated_chords: this.referenceData.deactivated_chords
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Error saving settings');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving chord settings');
             });
         },
         

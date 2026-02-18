@@ -14,6 +14,7 @@ from ear_training.ui.audio_player import AudioPlayer
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 CUSTOM_PROGRESSIONS_FILE = os.path.join(BASE_DIR, 'custom_progressions.json')
+DEACTIVATED_CHORDS_FILE = os.path.join(BASE_DIR, 'deactivated_chords.json')
 
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path='/static')
 CORS(app)
@@ -47,6 +48,26 @@ def save_custom_progressions(progressions):
         print(f"Error saving custom progressions: {e}")
         return False
 
+def load_deactivated_chords():
+    """Load deactivated chords from file."""
+    if os.path.exists(DEACTIVATED_CHORDS_FILE):
+        try:
+            with open(DEACTIVATED_CHORDS_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def save_deactivated_chords(chords):
+    """Save deactivated chords to file."""
+    try:
+        with open(DEACTIVATED_CHORDS_FILE, 'w') as f:
+            json.dump(chords, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving deactivated chords: {e}")
+        return False
+
 @app.route('/api/progression', methods=['POST'])
 def get_progression():
     """Generate a new chord progression."""
@@ -61,19 +82,46 @@ def get_progression():
     start_on_tonic = data.get('start_on_tonic', True)
     use_common_only = data.get('use_common_only', False)
     
-    progression = progression_trainer.generate_progression(
-        num_chords=num_chords,
-        start_on_tonic=start_on_tonic,
-        use_common_only=use_common_only
-    )
+    # Load deactivated chords
+    deactivated_chord_names = set(load_deactivated_chords())
+    
+    # Keep generating progressions until we get one without deactivated chords
+    max_attempts = 20
+    attempt = 0
+    valid_progression = False
+    progression = None
+    
+    while not valid_progression and attempt < max_attempts:
+        progression = progression_trainer.generate_progression(
+            num_chords=num_chords,
+            start_on_tonic=start_on_tonic,
+            use_common_only=use_common_only
+        )
+        
+        # Check if progression contains any deactivated chords
+        name_map = {
+            ChordNumber.IIIAUG: "III+",
+        }
+        
+        has_deactivated = False
+        for chord in progression:
+            chord_display = name_map.get(chord, chord.name)
+            if chord_display in deactivated_chord_names:
+                has_deactivated = True
+                break
+        
+        if not has_deactivated:
+            valid_progression = True
+        
+        attempt += 1
+    
+    if progression is None:
+        return jsonify({'error': 'Could not generate a valid progression'}), 500
     
     # Get frequencies for the progression
     frequencies = progression_trainer.get_progression_frequencies(use_inversions=True)
     
     # Return progression as strings, mapping special chords for display
-    name_map = {
-        ChordNumber.IIIAUG: "III+",
-    }
     progression_strs = [name_map.get(chord, chord.name) for chord in progression]
     
     return jsonify({
@@ -112,10 +160,14 @@ def get_reference():
     
     movements_sorted = sorted(list(movements))
     
+    # Get deactivated chords
+    deactivated = load_deactivated_chords()
+    
     return jsonify({
         'common_progressions': progressions_display,
         'all_chords': all_chords,
-        'chord_movements': movements_sorted
+        'chord_movements': movements_sorted,
+        'deactivated_chords': deactivated
     })
 
 @app.route('/api/custom-progressions', methods=['GET'])
@@ -180,6 +232,32 @@ def delete_custom_progression(prog_id):
     
     except Exception as e:
         print(f"Error deleting progression: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/deactivated-chords', methods=['GET'])
+def get_deactivated_chords():
+    """Get list of deactivated chords."""
+    try:
+        deactivated = load_deactivated_chords()
+        return jsonify({'deactivated_chords': deactivated})
+    except Exception as e:
+        print(f"Error loading deactivated chords: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/deactivated-chords', methods=['PUT'])
+def update_deactivated_chords():
+    """Update the list of deactivated chords."""
+    try:
+        data = request.json
+        deactivated = data.get('deactivated_chords', [])
+        
+        if save_deactivated_chords(deactivated):
+            return jsonify({'success': True, 'message': 'Deactivated chords updated'})
+        else:
+            return jsonify({'error': 'Failed to save deactivated chords'}), 500
+    
+    except Exception as e:
+        print(f"Error updating deactivated chords: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/play-chord', methods=['POST'])
