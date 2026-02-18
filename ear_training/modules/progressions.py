@@ -217,7 +217,7 @@ class ProgressionTrainer:
         Args:
             base_octave: Octave for tonic note
             use_inversions: If True, use inversions for smoother voice leading
-            include_bass_line: If True, add root note in bass for triads, use root position for 7th chords
+            include_bass_line: If True, add the root note an octave lower as an additional bass note
         
         Returns:
             List of frequency lists, one per chord in progression
@@ -231,11 +231,8 @@ class ProgressionTrainer:
         for i, chord in enumerate(self.current_progression):
             inversion = 0
             
-            # When using bass line with 7th chords, always use root position
-            if include_bass_line and len(self.get_chord_notes(chord, 0)) == 4:
-                inversion = 0
             # For the first chord (tonic), select an inversion based on the second chord
-            elif i == 0 and len(self.current_progression) > 1:
+            if i == 0 and len(self.current_progression) > 1:
                 next_chord = self.current_progression[1]
                 inversion = self._select_best_inversion_for_next(chord, next_chord, base_octave)
             # For subsequent chords, determine best inversion for voice leading if enabled
@@ -244,16 +241,9 @@ class ProgressionTrainer:
             
             chord_notes = self.get_chord_notes(chord, inversion)
             
-            # When adding bass line with triads, remove the root from voicing
-            # (we'll add it in the bass instead)
-            notes_to_play = chord_notes
-            if include_bass_line and len(self.get_chord_notes(chord, 0)) == 3:
-                # For triads, keep only 3rd and 5th (skip the root at index 0)
-                notes_to_play = chord_notes[1:]
-            
             # Convert semitone intervals to frequencies
             frequencies = []
-            for note_semitone in notes_to_play:
+            for note_semitone in chord_notes:
                 # Adjust octave for higher notes
                 octave = base_octave + (note_semitone // 12)
                 note_in_octave = note_semitone % 12
@@ -266,27 +256,20 @@ class ProgressionTrainer:
             # Don't sort frequencies - maintain voice leading relationships
             # Each voice should move to the nearest note in the next chord
             
-            # Track semitone values of notes we're actually playing for voice leading
-            actual_notes_semitones = list(notes_to_play)  # The notes we're playing (3rd, 5th for bass line triads)
-            
-            # Add bass line if requested (only for triads; 7th chords already have root in bass)
-            if include_bass_line and len(self.get_chord_notes(chord, 0)) == 3:
-                # Get the root note (first note of the chord in root position)
+            # Add bass line if requested: add the root note an octave lower
+            if include_bass_line:
                 root_semitone = self.get_chord_notes(chord, 0)[0]
-                # Add the root an octave lower (adjust down by 12 semitones)
-                bass_note_semitone = root_semitone - 12
-                actual_notes_semitones.insert(0, bass_note_semitone)  # Track for voice leading
-                
-                # Add the root an octave lower
+                # Calculate bass frequency (root lowered by one octave)
                 bass_octave = base_octave - 1
                 octave = bass_octave + (root_semitone // 12)
                 note_in_octave = root_semitone % 12
                 semitones_from_a4 = (octave - 4) * 12 + note_in_octave - 9
                 bass_frequency = self.base_freq * (2 ** (semitones_from_a4 / 12))
                 frequencies.insert(0, bass_frequency)  # Add bass as lowest note
+                frequencies.insert(0, bass_frequency)  # Add bass as lowest note
             
             all_frequencies.append(frequencies)
-            previous_notes = actual_notes_semitones  # Track actual notes for voice leading
+            previous_notes = chord_notes  # Track for voice leading on next chord
         
         return all_frequencies
     
