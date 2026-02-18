@@ -348,6 +348,7 @@ class ProgressionTrainer:
                                previous_notes: List[int],
                                base_octave: int) -> int:
         """Select the inversion that minimizes voice leading distance.
+        Uses optimal voice assignment: each voice moves to its nearest note in the next chord.
         
         Args:
             chord: Current chord
@@ -357,26 +358,71 @@ class ProgressionTrainer:
         Returns:
             Best inversion (0, 1, or 2)
         """
-        best_inversion = 0
-        best_distance = float('inf')
-        
-        previous_avg = sum(previous_notes) / len(previous_notes)
-
         base_notes = self.get_chord_notes(chord, 0)
         num_inversions = len(base_notes)
-
+        
+        best_inversion = 0
+        best_total_distance = float('inf')
+        
+        # Try each inversion and calculate optimal voice leading distances
         for inversion in range(num_inversions):
             chord_notes = self.get_chord_notes(chord, inversion)
-            current_avg = sum(chord_notes) / len(chord_notes)
             
-            # Calculate distance
-            distance = abs(current_avg - previous_avg)
+            # Calculate total voice leading distance using optimal assignment
+            # Each voice finds its nearest note in the next chord
+            total_distance = self._calculate_optimal_voice_distance(previous_notes, chord_notes)
             
-            if distance < best_distance:
-                best_distance = distance
+            if total_distance < best_total_distance:
+                best_total_distance = total_distance
                 best_inversion = inversion
         
         return best_inversion
+    
+    def _calculate_optimal_voice_distance(self, previous_notes: List[int], next_notes: List[int]) -> float:
+        """Calculate optimal voice leading distance by assigning each voice to its nearest target.
+        
+        For each current note, find the closest next note (considering octave equivalence).
+        This ensures A4 moves to B4 (9+2=11 semitones, i.e. +2), not B5 or B3.
+        
+        Args:
+            previous_notes: Semitone intervals of current chord
+            next_notes: Semitone intervals of next chord
+        
+        Returns:
+            Total voice leading distance
+        """
+        total_distance = 0
+        assigned_indices = set()
+        
+        # For each voice in the previous chord, find the nearest available note in the next chord
+        for prev_note in previous_notes:
+            best_next_idx = -1
+            best_distance = float('inf')
+            
+            # For each voice in the next chord
+            for next_idx, next_note in enumerate(next_notes):
+                if next_idx in assigned_indices:
+                    continue  # This voice is already assigned
+                
+                # Calculate distance considering octave equivalence
+                # Find distance to next_note's class in nearby octaves
+                note_class = next_note % 12
+                prev_class = prev_note % 12
+                
+                # Try different octaves for the next note
+                for octave_offset in range(-2, 3):  # Check octaves -2 to +2
+                    target_note = next_note + (octave_offset * 12)
+                    distance = abs(target_note - prev_note)
+                    
+                    if distance < best_distance:
+                        best_distance = distance
+                        best_next_idx = next_idx
+            
+            if best_next_idx >= 0:
+                assigned_indices.add(best_next_idx)
+                total_distance += best_distance
+        
+        return total_distance
     
     def submit_answer(self, user_progression: List[ChordNumber]) -> bool:
         """Submit user's progression guess.

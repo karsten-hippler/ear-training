@@ -138,7 +138,7 @@ createApp({
 
             // Body: each line with notes aligned in columns
             const bodyLines = lines.map(line =>
-                line.map(note => note.padStart(3, ' ')).join('  ').trimEnd()
+                line.map(note => (note || '').toString().padStart(3, ' ')).join('  ').trimEnd()
             );
 
             return header + '\n' + separator + '\n' + bodyLines.join('\n');

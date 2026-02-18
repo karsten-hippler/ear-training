@@ -429,46 +429,94 @@ def check_answer():
         progression_names = data.get('progression', [])
         expected_names = data.get('expected', [])
 
-        # Convert chord display names to enum names in a robust,
-        # case-insensitive way (handles ii, V7, vii°, etc.).
+        # Map display names back to enum names
+        display_to_enum = {
+            'I': 'I',
+            'IMAJ7': 'IMAJ7',
+            'Imaj7': 'IMAJ7',
+            'II': 'II',
+            'ii': 'II',
+            'II7': 'IIM7',
+            'ii7': 'IIM7',
+            'III': 'III',
+            'iii': 'III',
+            'III7': 'IIIM7',
+            'iii7': 'IIIM7',
+            'IIIAUG': 'IIIAUG',
+            'III+': 'IIIAUG',
+            'III7': 'III7',
+            'IV': 'IV',
+            'IVMAJ7': 'IVMAJ7',
+            'IVmaj7': 'IVMAJ7',
+            'V': 'V',
+            'V7': 'V7',
+            'VI': 'VI',
+            'vi': 'VI',
+            'VI7': 'VIM7',
+            'vi7': 'VIM7',
+            'VII': 'VII',
+            'vii°': 'VII',
+            'VII7': 'VIIM7B5',
+            'viiø7': 'VIIM7B5',
+        }
+
+        # Convert chord display names to enum names
         user_progression = []
         for chord_name in progression_names:
-            # Normalize input (strip whitespace, then upper-case)
-            raw = str(chord_name)
-            normalized = raw.strip()
-            upper = normalized.upper()
-
-            # Treat VII° / vii° as VII
-            if upper.endswith('°'):
-                upper = upper[:-1]
-
-            # Treat III+ as the augmented mediant enum
-            if upper == 'III+':
-                upper = 'IIIAUG'
-
-            if upper in ChordNumber.__members__:
-                user_progression.append(ChordNumber[upper])
+            raw = str(chord_name).strip()
+            
+            # Try direct lookup first
+            if raw in display_to_enum:
+                enum_name = display_to_enum[raw]
+                if enum_name in ChordNumber.__members__:
+                    user_progression.append(ChordNumber[enum_name])
+                else:
+                    print(f"Warning: Enum '{enum_name}' not found for chord '{raw}'")
+                    return jsonify({'error': f'Unknown chord: {raw}'}), 400
             else:
-                print(f"Warning: Unknown chord name '{chord_name}' (normalized: '{normalized}', upper: '{upper}')")
-                return jsonify({'error': f'Unknown chord: {chord_name}'}), 400
+                # Try uppercase
+                upper = raw.upper()
+                if upper == 'VII°':
+                    upper = 'VII'
+                if upper == 'VII°SLASH':
+                    upper = 'VIIM7B5'
+                if upper.endswith('°'):
+                    upper = upper[:-1]
+                if upper == 'III+':
+                    upper = 'IIIAUG'
+                
+                if upper in ChordNumber.__members__:
+                    user_progression.append(ChordNumber[upper])
+                else:
+                    print(f"Warning: Unknown chord name '{raw}'")
+                    return jsonify({'error': f'Unknown chord: {raw}'}), 400
         
         # Convert expected progression names to enum for comparison
         expected_progression = []
         for chord_name in expected_names:
-            # Normalize input (strip whitespace, then upper-case)
-            raw = str(chord_name)
-            normalized = raw.strip()
-            upper = normalized.upper()
+            raw = str(chord_name).strip()
             
-            # Treat III+ as the augmented mediant enum
-            if upper == 'III+':
-                upper = 'IIIAUG'
-            
-            if upper in ChordNumber.__members__:
-                expected_progression.append(ChordNumber[upper])
+            # Try display_to_enum mapping first
+            if raw in display_to_enum:
+                enum_name = display_to_enum[raw]
+                if enum_name in ChordNumber.__members__:
+                    expected_progression.append(ChordNumber[enum_name])
             else:
-                # If conversion fails, just use the name as-is for comparison
-                expected_progression.append(chord_name)
+                # Try as-is
+                upper = raw.upper()
+                if upper == 'VII°':
+                    upper = 'VII'
+                if upper == 'VII°SLASH':
+                    upper = 'VIIM7B5'
+                if upper.endswith('°'):
+                    upper = upper[:-1]
+                if upper == 'III+':
+                    upper = 'IIIAUG'
+                
+                if upper in ChordNumber.__members__:
+                    expected_progression.append(ChordNumber[upper])
+                else:
+                    expected_progression.append(chord_name)
         
         # Check if user's answer matches the expected progression
         is_correct = user_progression == expected_progression
