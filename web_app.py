@@ -99,8 +99,13 @@ def get_progression():
         )
         
         # Check if progression contains any deactivated chords
+        # Use same name mapping as reference endpoint
         name_map = {
+            ChordNumber.II: "ii",
+            ChordNumber.III: "iii",
             ChordNumber.IIIAUG: "III+",
+            ChordNumber.VI: "vi",
+            ChordNumber.VII: "vii°",
         }
         
         has_deactivated = False
@@ -133,9 +138,13 @@ def get_progression():
 @app.route('/api/reference', methods=['GET'])
 def get_reference():
     """Get common progressions and chord reference information."""
-    # Map chord names for display
+    # Map chord names for display - must match frontend's chordEnumToDisplay function
     name_map = {
+        ChordNumber.II: "ii",
+        ChordNumber.III: "iii",
         ChordNumber.IIIAUG: "III+",
+        ChordNumber.VI: "vi",
+        ChordNumber.VII: "vii°",
     }
     
     # Get all common progressions from the trainer
@@ -457,7 +466,11 @@ def check_answer():
         
         # Map chord names for display consistency (same as /api/progression)
         name_map = {
+            ChordNumber.II: "ii",
+            ChordNumber.III: "iii",
             ChordNumber.IIIAUG: "III+",
+            ChordNumber.VI: "vi",
+            ChordNumber.VII: "vii°",
         }
         actual = [name_map.get(c, c.name) if isinstance(c, ChordNumber) else c for c in expected_progression]
         user = [name_map.get(c, c.name) for c in user_progression]
