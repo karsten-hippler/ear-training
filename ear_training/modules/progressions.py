@@ -244,9 +244,16 @@ class ProgressionTrainer:
             
             chord_notes = self.get_chord_notes(chord, inversion)
             
+            # When adding bass line with triads, remove the root from voicing
+            # (we'll add it in the bass instead)
+            notes_to_play = chord_notes
+            if include_bass_line and len(self.get_chord_notes(chord, 0)) == 3:
+                # For triads, keep only 3rd and 5th (skip the root at index 0)
+                notes_to_play = chord_notes[1:]
+            
             # Convert semitone intervals to frequencies
             frequencies = []
-            for note_semitone in chord_notes:
+            for note_semitone in notes_to_play:
                 # Adjust octave for higher notes
                 octave = base_octave + (note_semitone // 12)
                 note_in_octave = note_semitone % 12
@@ -271,7 +278,7 @@ class ProgressionTrainer:
                 frequencies.insert(0, bass_frequency)  # Add bass as lowest note
             
             all_frequencies.append(frequencies)
-            previous_notes = chord_notes
+            previous_notes = chord_notes  # Use original notes for voice leading on next chord
         
         return all_frequencies
     
