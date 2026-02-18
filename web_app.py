@@ -13,6 +13,7 @@ from ear_training.ui.audio_player import AudioPlayer
 # Get the directory where this script is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
+CUSTOM_PROGRESSIONS_FILE = os.path.join(BASE_DIR, 'custom_progressions.json')
 
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path='/static')
 CORS(app)
@@ -25,6 +26,26 @@ audio_players = {
     "violin": AudioPlayer(sample_rate=44100, duration=0.8),
     "flute": AudioPlayer(sample_rate=44100, duration=0.8),
 }
+
+def load_custom_progressions():
+    """Load custom progressions from file."""
+    if os.path.exists(CUSTOM_PROGRESSIONS_FILE):
+        try:
+            with open(CUSTOM_PROGRESSIONS_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def save_custom_progressions(progressions):
+    """Save custom progressions to file."""
+    try:
+        with open(CUSTOM_PROGRESSIONS_FILE, 'w') as f:
+            json.dump(progressions, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving custom progressions: {e}")
+        return False
 
 @app.route('/api/progression', methods=['POST'])
 def get_progression():
@@ -96,6 +117,70 @@ def get_reference():
         'all_chords': all_chords,
         'chord_movements': movements_sorted
     })
+
+@app.route('/api/custom-progressions', methods=['GET'])
+def get_custom_progressions():
+    """Get all saved custom progressions."""
+    try:
+        custom_progs = load_custom_progressions()
+        return jsonify({
+            'custom_progressions': custom_progs
+        })
+    except Exception as e:
+        print(f"Error loading custom progressions: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/custom-progressions', methods=['POST'])
+def save_custom_progression():
+    """Save a new custom progression."""
+    try:
+        data = request.json
+        progression = data.get('progression', [])
+        
+        if not progression:
+            return jsonify({'error': 'Empty progression'}), 400
+        
+        # Load existing progressions
+        custom_progs = load_custom_progressions()
+        
+        # Add new progression with metadata
+        new_prog = {
+            'progression': progression,
+            'display': ' - '.join(progression),
+            'id': len(custom_progs) + 1
+        }
+        
+        custom_progs.append(new_prog)
+        
+        # Save to file
+        if save_custom_progressions(custom_progs):
+            return jsonify({
+                'success': True,
+                'message': 'Progression saved',
+                'id': new_prog['id']
+            })
+        else:
+            return jsonify({'error': 'Failed to save progression'}), 500
+    
+    except Exception as e:
+        print(f"Error saving progression: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/custom-progressions/<int:prog_id>', methods=['DELETE'])
+def delete_custom_progression(prog_id):
+    """Delete a custom progression."""
+    try:
+        custom_progs = load_custom_progressions()
+        custom_progs = [p for p in custom_progs if p.get('id') != prog_id]
+        
+        if save_custom_progressions(custom_progs):
+            return jsonify({'success': True, 'message': 'Progression deleted'})
+        else:
+            return jsonify({'error': 'Failed to delete progression'}), 500
+    
+    except Exception as e:
+        print(f"Error deleting progression: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/play-chord', methods=['POST'])
 def play_chord():

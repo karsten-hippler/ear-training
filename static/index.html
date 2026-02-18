@@ -131,6 +131,51 @@
                 <h2>Chord Reference</h2>
                 
                 <div class="reference-section">
+                    <h3>Create New Progression</h3>
+                    <button v-if="!creatingProgression" @click="startCreatingProgression" class="btn btn-primary">+ New Progression</button>
+                    
+                    <div v-if="creatingProgression" class="progression-builder">
+                        <div class="builder-header">
+                            <h4>Click chords to build your progression:</h4>
+                            <div class="progression-display">
+                                <span v-if="customProgression.length === 0" class="empty-state">No chords selected yet...</span>
+                                <span v-for="(chord, idx) in customProgression" :key="idx" class="progression-chord">
+                                    {{ chord }}
+                                    <button @click="removeChordFromProgression(idx)" class="remove-btn">×</button>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="chords-buttons">
+                            <button 
+                                v-for="chord in referenceData.all_chords" 
+                                :key="chord" 
+                                @click="addChordToProgression(chord)"
+                                class="btn btn-chord chord-select-btn"
+                            >
+                                {{ chord }}
+                            </button>
+                        </div>
+                        
+                        <div class="builder-actions">
+                            <button @click="customProgression = []" class="btn btn-secondary">Clear</button>
+                            <button @click="cancelCreatingProgression" class="btn btn-secondary">Cancel</button>
+                            <button @click="saveCustomProgression" :disabled="customProgression.length === 0" class="btn btn-primary">Save Progression</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="savedProgressions.length > 0" class="reference-section">
+                    <h3>Your Saved Progressions</h3>
+                    <div class="saved-progressions-list">
+                        <div v-for="prog in savedProgressions" :key="prog.id" class="saved-progression-item">
+                            <span class="progression-text">{{ prog.display }}</span>
+                            <button @click="deleteSavedProgression(prog.id)" class="btn btn-small btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reference-section">
                     <h3>All Available Chords</h3>
                     <div class="chords-list">
                         <span v-for="chord in referenceData.all_chords" :key="chord" class="chord-badge">{{ chord }}</span>

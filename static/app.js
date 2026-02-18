@@ -41,6 +41,9 @@ createApp({
                 common_progressions: [],
                 chord_movements: []
             },
+            creatingProgression: false,
+            customProgression: [],
+            savedProgressions: [],
         };
     },
     
@@ -450,6 +453,89 @@ createApp({
             }
         },
         
+        startCreatingProgression() {
+            this.creatingProgression = true;
+            this.customProgression = [];
+        },
+        
+        addChordToProgression(chord) {
+            this.customProgression.push(chord);
+        },
+        
+        removeChordFromProgression(idx) {
+            this.customProgression.splice(idx, 1);
+        },
+        
+        cancelCreatingProgression() {
+            this.creatingProgression = false;
+            this.customProgression = [];
+        },
+        
+        saveCustomProgression() {
+            if (this.customProgression.length === 0) return;
+            
+            const progressionText = this.customProgression.join(' - ');
+            
+            fetch('/api/custom-progressions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    progression: this.customProgression
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✓ Progression saved: ${progressionText}`);
+                    this.loadSavedProgressions();
+                    this.creatingProgression = false;
+                    this.customProgression = [];
+                } else {
+                    alert('Error saving progression: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving progression');
+            });
+        },
+        
+        async loadSavedProgressions() {
+            try {
+                const response = await fetch('/api/custom-progressions');
+                const data = await response.json();
+                this.savedProgressions = data.custom_progressions || [];
+            } catch (error) {
+                console.error('Error loading saved progressions:', error);
+            }
+        },
+        
+        deleteSavedProgression(progId) {
+            if (!confirm('Delete this progression?')) return;
+            
+            fetch(`/api/custom-progressions/${progId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✓ Progression deleted');
+                    this.loadSavedProgressions();
+                } else {
+                    alert('Error deleting progression: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting progression');
+            });
+        },
+        
         exit() {
             if (this.total > 0) {
                 const percentage = ((this.score / this.total) * 100).toFixed(1);
@@ -461,5 +547,6 @@ createApp({
     mounted() {
         this.generateNewProgression();
         this.loadReferenceData();
+        this.loadSavedProgressions();
     }
 }).mount('#app');

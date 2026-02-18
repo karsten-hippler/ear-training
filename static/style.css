@@ -440,4 +440,123 @@ h1 {
     color: #0066cc;
 }
 
+/* Progression Builder */
+.progression-builder {
+    background-color: #f0f8ff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid #0066cc;
+    margin-top: 15px;
+}
+
+.builder-header {
+    margin-bottom: 20px;
+}
+
+.builder-header h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.progression-display {
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    min-height: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    border: 2px dashed #0066cc;
+}
+
+.empty-state {
+    color: #999;
+    font-style: italic;
+}
+
+.progression-chord {
+    background-color: #0066cc;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 4px;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.remove-btn:hover {
+    opacity: 1;
+}
+
+.chords-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+}
+
+.chord-select-btn {
+    padding: 8px 15px;
+    font-weight: bold;
+    min-width: 60px;
+    flex: 0 1 auto;
+}
+
+.chord-select-btn:hover {
+    transform: scale(1.05);
+}
+
+.builder-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.builder-actions .btn {
+    min-width: 120px;
+}
+
+/* Saved Progressions */
+.saved-progressions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.saved-progression-item {
+    background-color: white;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid #27ae60;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.progression-text {
+    color: #333;
+}
+
+.saved-progression-item .btn-danger {
+    padding: 6px 12px;
+    font-size: 0.9em;
+}
+
 
