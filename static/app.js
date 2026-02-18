@@ -9,6 +9,7 @@ createApp({
             playbackSpeed: 1.0,
             startOnTonic: true,
             useCommonOnly: false,
+            playAsArpeggio: false,
             
             currentProgression: [],
             currentFrequencies: [],
@@ -138,6 +139,14 @@ createApp({
         async playChordsSequence() {
             if (this.currentFrequencies.length === 0) return;
             
+            if (this.playAsArpeggio) {
+                await this.playArpeggioSequence();
+            } else {
+                await this.playChordSequence();
+            }
+        },
+        
+        async playChordSequence() {
             this.isPlaying = true;
 
             // Prefetch all chord audio first so network and synthesis
@@ -182,44 +191,8 @@ createApp({
                 this.isPlaying = false;
             }, totalDuration);
         },
-
-        async fetchChordAudio(frequencies, chordName) {
-            try {
-                const response = await fetch('/api/play-chord', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        frequencies: frequencies,
-                        instrument: this.selectedInstrument.toLowerCase(),
-                        playback_speed: this.playbackSpeed,
-                        // Map 100–1000% slider to a 1.0–10.0x root multiplier
-                        root_volume_multiplier: this.rootVolume / 100.0,
-                        chord_name: chordName
-                    })
-                });
-                
-                if (!response.ok) {
-                    console.error('Error response from server:', response.status);
-                    return null;
-                }
-                
-                const audioBlob = await response.blob();
-                console.log('Received audio blob:', audioBlob.size, 'bytes');
-                
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                audio.volume = 0.8; // Set volume to 80%
-
-                return audio;
-            } catch (error) {
-                console.error('Error fetching chord audio:', error);
-                return null;
-            }
-        },
         
-        async playArpeggio() {
+        async playArpeggioSequence() {
             if (this.currentFrequencies.length === 0) return;
             
             // Collect all notes from all chords
@@ -279,6 +252,42 @@ createApp({
             }
             
             this.isPlaying = false;
+        },
+
+        async fetchChordAudio(frequencies, chordName) {
+            try {
+                const response = await fetch('/api/play-chord', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        frequencies: frequencies,
+                        instrument: this.selectedInstrument.toLowerCase(),
+                        playback_speed: this.playbackSpeed,
+                        // Map 100–1000% slider to a 1.0–10.0x root multiplier
+                        root_volume_multiplier: this.rootVolume / 100.0,
+                        chord_name: chordName
+                    })
+                });
+                
+                if (!response.ok) {
+                    console.error('Error response from server:', response.status);
+                    return null;
+                }
+                
+                const audioBlob = await response.blob();
+                console.log('Received audio blob:', audioBlob.size, 'bytes');
+                
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.volume = 0.8; // Set volume to 80%
+
+                return audio;
+            } catch (error) {
+                console.error('Error fetching chord audio:', error);
+                return null;
+            }
         },
         
         async repeatProgression() {

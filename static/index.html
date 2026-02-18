@@ -101,11 +101,15 @@
                             <input type="checkbox" v-model="useCommonOnly">
                             Common Progressions Only
                         </label>
+                        <label>
+                            <input type="checkbox" v-model="playAsArpeggio">
+                            Play as Arpeggio
+                        </label>
                     </div>
                 </div>
 
                 <div class="button-group bottom-button-group">
-                    <button @click="playArpeggio" class="btn btn-primary">▶ Play as Arpeggio</button>
+                    <button @click="playProgression" class="btn btn-primary">▶ Play</button>
                     <button @click="playTonic" class="btn btn-secondary">♪ Play Tonic</button>
                 </div>
             </div>
