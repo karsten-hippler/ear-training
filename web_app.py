@@ -228,6 +228,7 @@ def check_answer():
     try:
         data = request.json
         progression_names = data.get('progression', [])
+        expected_names = data.get('expected', [])
 
         # Convert chord display names to enum names in a robust,
         # case-insensitive way (handles ii, V7, vii°, etc.).
@@ -252,13 +253,36 @@ def check_answer():
                 print(f"Warning: Unknown chord name '{chord_name}' (normalized: '{normalized}', upper: '{upper}')")
                 return jsonify({'error': f'Unknown chord: {chord_name}'}), 400
         
-        is_correct = progression_trainer.submit_answer(user_progression)
+        # Convert expected progression names to enum for comparison
+        expected_progression = []
+        for chord_name in expected_names:
+            # Normalize input (strip whitespace, then upper-case)
+            raw = str(chord_name)
+            normalized = raw.strip()
+            upper = normalized.upper()
+            
+            # Treat III+ as the augmented mediant enum
+            if upper == 'III+':
+                upper = 'IIIAUG'
+            
+            if upper in ChordNumber.__members__:
+                expected_progression.append(ChordNumber[upper])
+            else:
+                # If conversion fails, just use the name as-is for comparison
+                expected_progression.append(chord_name)
+        
+        # Check if user's answer matches the expected progression
+        is_correct = user_progression == expected_progression
+        
+        # Ensure we have valid data to return
+        if not expected_names:
+            return jsonify({'error': 'No expected progression provided.'}), 400
         
         # Map chord names for display consistency (same as /api/progression)
         name_map = {
             ChordNumber.IIIAUG: "III+",
         }
-        actual = [name_map.get(c, c.name) for c in progression_trainer.current_progression]
+        actual = [name_map.get(c, c.name) if isinstance(c, ChordNumber) else c for c in expected_progression]
         user = [name_map.get(c, c.name) for c in user_progression]
         
         return jsonify({

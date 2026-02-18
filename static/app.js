@@ -417,7 +417,8 @@ createApp({
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        progression: this.userProgression
+                        progression: this.userProgression,
+                        expected: this.currentProgression
                     })
                 });
                 
