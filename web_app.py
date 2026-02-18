@@ -81,6 +81,7 @@ def get_progression():
     
     start_on_tonic = data.get('start_on_tonic', True)
     use_common_only = data.get('use_common_only', False)
+    include_bass_line = data.get('include_bass_line', False)
     
     # Load deactivated chords
     deactivated_chord_names = set(load_deactivated_chords())
@@ -130,7 +131,7 @@ def get_progression():
         return jsonify({'error': 'Could not generate a valid progression'}), 500
     
     # Get frequencies for the progression
-    frequencies = progression_trainer.get_progression_frequencies(use_inversions=True)
+    frequencies = progression_trainer.get_progression_frequencies(use_inversions=True, include_bass_line=include_bass_line)
     
     # Return progression as strings, mapping special chords for display
     progression_strs = [name_map.get(chord, chord.name) for chord in progression]

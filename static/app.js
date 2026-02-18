@@ -10,6 +10,7 @@ createApp({
             startOnTonic: true,
             useCommonOnly: false,
             playAsArpeggio: false,
+            includeBassLine: false,
             
             currentProgression: [],
             currentFrequencies: [],
@@ -365,7 +366,8 @@ createApp({
                     body: JSON.stringify({
                         num_chords: this.numChords,
                         start_on_tonic: this.startOnTonic,
-                        use_common_only: this.useCommonOnly
+                        use_common_only: this.useCommonOnly,
+                        include_bass_line: this.includeBassLine
                     })
                 });
                 

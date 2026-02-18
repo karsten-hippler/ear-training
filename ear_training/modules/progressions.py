@@ -210,12 +210,14 @@ class ProgressionTrainer:
     
     def get_progression_frequencies(self, 
                                    base_octave: int = 4,
-                                   use_inversions: bool = True) -> List[List[float]]:
+                                   use_inversions: bool = True,
+                                   include_bass_line: bool = False) -> List[List[float]]:
         """Get frequencies for all chords in current progression with voice leading.
         
         Args:
             base_octave: Octave for tonic note
             use_inversions: If True, use inversions for smoother voice leading
+            include_bass_line: If True, add root note in bass for triads, use root position for 7th chords
         
         Returns:
             List of frequency lists, one per chord in progression
@@ -229,8 +231,11 @@ class ProgressionTrainer:
         for i, chord in enumerate(self.current_progression):
             inversion = 0
             
+            # When using bass line with 7th chords, always use root position
+            if include_bass_line and len(self.get_chord_notes(chord, 0)) == 4:
+                inversion = 0
             # For the first chord (tonic), select an inversion based on the second chord
-            if i == 0 and len(self.current_progression) > 1:
+            elif i == 0 and len(self.current_progression) > 1:
                 next_chord = self.current_progression[1]
                 inversion = self._select_best_inversion_for_next(chord, next_chord, base_octave)
             # For subsequent chords, determine best inversion for voice leading if enabled
@@ -252,6 +257,19 @@ class ProgressionTrainer:
                 frequencies.append(frequency)
             
             frequencies.sort()  # Sort for proper chord voicing
+            
+            # Add bass line if requested
+            if include_bass_line:
+                # Get the root note (first note of the chord in root position)
+                root_semitone = self.get_chord_notes(chord, 0)[0]
+                # Add the root an octave lower
+                bass_octave = base_octave - 1
+                octave = bass_octave + (root_semitone // 12)
+                note_in_octave = root_semitone % 12
+                semitones_from_a4 = (octave - 4) * 12 + note_in_octave - 9
+                bass_frequency = self.base_freq * (2 ** (semitones_from_a4 / 12))
+                frequencies.insert(0, bass_frequency)  # Add bass as lowest note
+            
             all_frequencies.append(frequencies)
             previous_notes = chord_notes
         
