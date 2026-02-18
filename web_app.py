@@ -207,9 +207,6 @@ def check_answer():
         data = request.json
         progression_names = data.get('progression', [])
         expected_names = data.get('expected', [])
-        
-        print(f"CHECK-ANSWER: received progression_names={progression_names}")
-        print(f"CHECK-ANSWER: received expected_names={expected_names}")
 
         # Convert chord display names to enum names in a robust,
         # case-insensitive way (handles ii, V7, vii°, etc.).
@@ -265,10 +262,6 @@ def check_answer():
         }
         actual = [name_map.get(c, c.name) if isinstance(c, ChordNumber) else c for c in expected_progression]
         user = [name_map.get(c, c.name) for c in user_progression]
-        
-        print(f"CHECK-ANSWER: returning actual={actual}")
-        print(f"CHECK-ANSWER: returning user={user}")
-        print(f"CHECK-ANSWER: is_correct={is_correct}")
         
         return jsonify({
             'correct': is_correct,
