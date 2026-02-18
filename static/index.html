@@ -39,7 +39,6 @@
             <!-- Play Buttons (moved below chord buttons) -->
             <div class="button-group">
                 <button @click="playProgression" class="btn btn-primary">▶ Play Progression</button>
-                <button @click="repeatProgression" class="btn btn-primary">↻ Repeat</button>
             </div>
 
             <!-- Result Message (solution) -->
@@ -50,6 +49,11 @@
             <!-- Chord Notes Display (stacked solution) -->
             <div v-if="chordNotesDisplay" class="chord-notes">
                 {{ chordNotesDisplay }}
+            </div>
+
+            <!-- Repeat button under stacked chords -->
+            <div v-if="chordNotesDisplay" class="button-group">
+                <button @click="repeatProgression" class="btn btn-primary">↻ Repeat</button>
             </div>
 
             <!-- Score moved below resolution/solution box -->
